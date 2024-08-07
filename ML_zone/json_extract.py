@@ -3,19 +3,17 @@ import json
 import re
 
 def extract_student_data(content):
+    data = {}
     try:
-        # Parse the content string as JSON
-        content_dict = json.loads(content)
+        # Split the content into separate JSON objects
+        json_objects = content.strip().split('\n\n')
+        for json_object in json_objects:
+            if json_object.strip():  # Ensure it's not an empty string
+                parsed_object = json.loads(json_object.strip())
+                student_id = str(parsed_object["student_id"])  # Convert student_id to string
+                data[student_id] = parsed_object["questions"]
     except json.JSONDecodeError as e:
         print(f"Failed to parse JSON response: {e}")
-        return {}  # Return an empty dictionary on error
-
-    data = {}
-
-    for key, questions in content_dict.items():
-        student_key = key.strip()  # Ensuring no extra spaces
-        data[student_key] = questions
-
     return data
 
 def save_combined_json(data, output_file):
